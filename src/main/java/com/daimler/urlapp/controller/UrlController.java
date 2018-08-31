@@ -39,7 +39,7 @@ public class UrlController {
     }
 
     @PostMapping("/urls/shorten")
-    public ResponseEntity<?> shortenUrl(@Valid @RequestBody Url url) {
+    public ResponseEntity<?> shortenUrl(@Valid @RequestBody final Url url) {
         if (urlConverter.isUrl(url.getPath())) {
             long id = urlStore.save(url).getId();
             return ResponseEntity.ok(urlConverter.shortenUrl(url.getPath(), id));
@@ -47,33 +47,42 @@ public class UrlController {
             return ResponseEntity.badRequest().build();
         }
     }
-    
-    @PostMapping("/urls/shorten/")
-    public ResponseEntity<?> shortenUrl(@Valid @RequestBody Url url) {
+
+    @PostMapping("/urls/shorten/{userHash}")
+    public ResponseEntity<?> shortenUrl(@PathVariable final String userHash, @Valid @RequestBody Url url) {
         if (urlConverter.isUrl(url.getPath())) {
-            long id = urlStore.save(url).getId();
-            return ResponseEntity.ok(urlConverter.shortenUrl(url.getPath(), id));
+            url.setCustomHash(userHash);
+            urlStore.save(url);
+            return ResponseEntity.ok(urlConverter.shortenUrl(url.getPath(), userHash));
         } else {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @PostMapping("/urls/expand")
-    public ResponseEntity<?> redirectUrl(@Valid @RequestBody Url url) {
+    public ResponseEntity<?> redirectUrl(@Valid @RequestBody final Url url) {
         if (urlConverter.isUrl(url.getPath())) {
             long id = urlConverter.getDatabaseId(url.getPath());
-            if (id > 0) {
+
+            if (urlStore.findById(id).isPresent()) {
                 return ResponseEntity.ok(urlStore.findById(id).get());
             } else {
-                throw new ResourceNotFoundException("URL doesn't exist in database.");
+                String hash = urlConverter.getHash(url.getPath());
+                Url longUrl = urlStore.fetchByCustomHash(hash);
+                if (longUrl != null) {
+                    return ResponseEntity.ok(longUrl);
+                } else {
+                    throw new ResourceNotFoundException("URL doesn't exist in database.");
+                }
             }
+
         } else {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @PutMapping("/urls/{urlId}")
-    public ResponseEntity<?> updateQuestion(@PathVariable Long urlId, @Valid @RequestBody Url url) {
+    public ResponseEntity<?> updateQuestion(@PathVariable final Long urlId, @Valid @RequestBody Url url) {
         return urlStore.findById(urlId).map(urlHit -> {
             urlHit.setPath(url.getPath());
             urlStore.save(urlHit);
@@ -82,7 +91,7 @@ public class UrlController {
     }
 
     @DeleteMapping("/urls/{urlId}")
-    public ResponseEntity<?> deleteUrl(@PathVariable Long urlId) {
+    public ResponseEntity<?> deleteUrl(@PathVariable final Long urlId) {
         return urlStore.findById(urlId).map(url -> {
             urlStore.delete(url);
             return ResponseEntity.ok().build();

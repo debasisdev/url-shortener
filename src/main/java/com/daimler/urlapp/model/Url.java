@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -14,6 +15,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "urls")
+@NamedQuery(name = "Url.fetchByCustomHash", query = "SELECT u FROM Url u WHERE u.customHash = :hash")
 public class Url extends AuditEntity {
 
     private static final long serialVersionUID = -5502043778089640767L;
@@ -25,6 +27,9 @@ public class Url extends AuditEntity {
 
     @Column(columnDefinition = "text", nullable = false)
     private String path;
+
+    @Column(columnDefinition = "text", nullable = true)
+    private String customHash;
 
     public Long getId() {
         return id;
@@ -40,6 +45,14 @@ public class Url extends AuditEntity {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public String getCustomHash() {
+        return customHash;
+    }
+
+    public void setCustomHash(String customHash) {
+        this.customHash = customHash;
     }
 
     @Override

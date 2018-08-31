@@ -1,0 +1,207 @@
+{
+	"info": {
+		"_postman_id": "39fac6cf-b7df-4033-a6df-c35872b8e124",
+		"name": "Daimler URL Shortener",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Shorten URL",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"path\" : \"https://www.daimler.com/innovation/efficiency/\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/urls/shorten",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"urls",
+						"shorten"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Shorten URL (User Defined Hash)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"path\" : \"https://www.daimler.com/innovation/design/en/\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/urls/shorten/design",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"urls",
+						"shorten",
+						"design"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Show all URLs",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"path\" : \"https://www.daimler.com/innovation/design/en/\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/urls",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"urls"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Expand URL",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"path\" : \"https://daiml.er/bfP3Qq\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/urls/expand",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"urls",
+						"expand"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update URL by ID",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"path\" : \"https://www.daimler.com/innovation/efficiency/\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/urls/1000000000",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"urls",
+						"1000000000"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete URL by ID",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"path\" : \"https://www.daimler.com/innovation/efficiency/\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/urls/1000000000",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"urls",
+						"1000000000"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

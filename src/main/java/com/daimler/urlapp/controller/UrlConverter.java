@@ -20,12 +20,9 @@ public class UrlConverter implements IConverter {
 
     @Override
     public long getDatabaseId(String shortUrl) {
-        
-        Pattern pattern = Pattern.compile(".*/\\s*(.*)");
-        Matcher localMatcher = pattern.matcher(shortUrl);
-        
-        if (localMatcher.find()) {
-            return shortURLtoId(localMatcher.group(1));
+        String hash = getHash(shortUrl);
+        if (hash != null) {
+            return shortURLtoId(hash);
         } else {
             return Long.MIN_VALUE;
         }
@@ -35,6 +32,13 @@ public class UrlConverter implements IConverter {
     public Url shortenUrl(String url, long databaseId) {
         Url shortUrl = new Url();
         shortUrl.setPath(computeDomain(url) + "/" + idToShortURL(databaseId));
+        return shortUrl;
+    }
+
+    @Override
+    public Url shortenUrl(String url, String userHash) {
+        Url shortUrl = new Url();
+        shortUrl.setPath(computeDomain(url) + "/" + userHash);
         return shortUrl;
     }
 
@@ -86,6 +90,17 @@ public class UrlConverter implements IConverter {
         String[] customSchemes = { "http", "https" };
         UrlValidator urlValidator = new UrlValidator(customSchemes);
         return urlValidator.isValid(url);
+    }
+
+    public String getHash(String shortUrl) {
+        Pattern pattern = Pattern.compile(".*/\\s*(.*)");
+        Matcher localMatcher = pattern.matcher(shortUrl);
+
+        if (localMatcher.find()) {
+            return localMatcher.group(1);
+        } else {
+            return null;
+        }
     }
 
 }

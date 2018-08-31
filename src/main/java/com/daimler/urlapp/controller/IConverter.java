@@ -11,5 +11,7 @@ public interface IConverter {
 
     Url shortenUrl(String url, long databaseId);
 
+    Url shortenUrl(String url, String userHash);
+
     long getDatabaseId(String shortUrl);
 }
