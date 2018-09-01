@@ -61,23 +61,18 @@ public class UrlController {
 
     @PostMapping("/urls/expand")
     public ResponseEntity<?> redirectUrl(@Valid @RequestBody final Url url) {
-        if (urlConverter.isUrl(url.getPath())) {
-            long id = urlConverter.getDatabaseId(url.getPath());
+        long id = urlConverter.getDatabaseId(url.getPath());
 
-            if (urlStore.findById(id).isPresent()) {
-                return ResponseEntity.ok(urlStore.findById(id).get());
-            } else {
-                String hash = urlConverter.getHash(url.getPath());
-                Url longUrl = urlStore.fetchByCustomHash(hash);
-                if (longUrl != null) {
-                    return ResponseEntity.ok(longUrl);
-                } else {
-                    throw new ResourceNotFoundException("URL doesn't exist in database.");
-                }
-            }
-
+        if (urlStore.findById(id).isPresent()) {
+            return ResponseEntity.ok(urlStore.findById(id).get());
         } else {
-            return ResponseEntity.badRequest().build();
+            String hash = urlConverter.getHash(url.getPath());
+            Url longUrl = urlStore.fetchByCustomHash(hash);
+            if (longUrl != null) {
+                return ResponseEntity.ok(longUrl);
+            } else {
+                throw new ResourceNotFoundException("URL doesn't exist in database.");
+            }
         }
     }
 
