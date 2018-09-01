@@ -1,14 +1,11 @@
 package com.daimler.urlapp.controller;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +16,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.daimler.urlapp.exception.BusinessLogicException;
+import com.daimler.urlapp.exception.InvalidUserRequestException;
 import com.daimler.urlapp.exception.ResourceNotFoundException;
 import com.daimler.urlapp.model.Url;
 import com.daimler.urlapp.store.UrlStore;
@@ -46,9 +45,14 @@ public class UrlController {
     public ResponseEntity<?> shortenUrl(@Valid @RequestBody final Url url) {
         if (urlConverter.isUrl(url.getPath())) {
             long id = urlStore.save(url).getId();
-            return ResponseEntity.ok(urlConverter.shortenUrl(url.getPath(), id));
+            Url shortUrl = urlConverter.shortenUrl(url.getPath(), id);
+            if (shortUrl != null) {
+                return ResponseEntity.ok(shortUrl);
+            } else {
+                throw new BusinessLogicException("Short URL computed to be null.");
+            }
         } else {
-            return ResponseEntity.badRequest().build();
+            throw new InvalidUserRequestException("URL is not Valid.");
         }
     }
 
@@ -57,33 +61,31 @@ public class UrlController {
         if (urlConverter.isUrl(url.getPath())) {
             url.setCustomHash(userHash);
             urlStore.save(url);
-            return ResponseEntity.ok(urlConverter.shortenUrl(url.getPath(), userHash));
+            Url shortUrl = urlConverter.shortenUrl(url.getPath(), userHash);
+            if (shortUrl != null) {
+                return ResponseEntity.ok(shortUrl);
+            } else {
+                throw new BusinessLogicException("Short URL computed to be null.");
+            }
         } else {
-            return ResponseEntity.badRequest().build();
+            throw new InvalidUserRequestException("URL is not Valid.");
         }
     }
 
     @PostMapping("/urls/expand")
     public ResponseEntity<?> redirectUrl(@Valid @RequestBody final Url url) {
-        HttpHeaders httpHeaders = new HttpHeaders();
-
         long id = urlConverter.getDatabaseId(url.getPath());
-        try {
-            if (urlStore.findById(id).isPresent()) {
-                httpHeaders.setLocation(new URI(urlStore.findById(id).get().getPath()));
-                return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
+
+        if (urlStore.findById(id).isPresent()) {
+            return new ResponseEntity<Url>(urlStore.findById(id).get(), HttpStatus.TEMPORARY_REDIRECT);
+        } else {
+            String hash = urlConverter.getHash(url.getPath());
+            Url longUrl = urlStore.fetchByCustomHash(hash);
+            if (longUrl != null) {
+                return new ResponseEntity<Url>(longUrl, HttpStatus.TEMPORARY_REDIRECT);
             } else {
-                String hash = urlConverter.getHash(url.getPath());
-                Url longUrl = urlStore.fetchByCustomHash(hash);
-                if (longUrl != null) {
-                    httpHeaders.setLocation(new URI(longUrl.getPath()));
-                    return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
-                } else {
-                    throw new ResourceNotFoundException("URL doesn't exist in database.");
-                }
+                throw new ResourceNotFoundException("URL doesn't exist in database.");
             }
-        } catch (URISyntaxException uriSyntaxException) {
-            return ResponseEntity.status(500).build();
         }
     }
 

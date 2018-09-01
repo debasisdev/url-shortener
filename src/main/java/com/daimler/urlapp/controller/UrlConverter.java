@@ -5,9 +5,13 @@ import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.stereotype.Service;
 
+import com.daimler.urlapp.GLOBALS;
+import com.daimler.urlapp.exception.BusinessLogicException;
 import com.daimler.urlapp.model.Url;
 
 /**
@@ -19,7 +23,7 @@ import com.daimler.urlapp.model.Url;
 public class UrlConverter implements IConverter {
 
     @Override
-    public long getDatabaseId(String shortUrl) {
+    public long getDatabaseId(final String shortUrl) {
         String hash = getHash(shortUrl);
         if (hash != null) {
             return shortURLtoId(hash);
@@ -29,50 +33,55 @@ public class UrlConverter implements IConverter {
     }
 
     @Override
-    public Url shortenUrl(String url, long databaseId) {
+    public Url shortenUrl(final String url, final long databaseId) {
         Url shortUrl = new Url();
-        shortUrl.setPath(computeDomain(url) + "/" + idToShortURL(databaseId));
+        shortUrl.setPath(computeDomain(url) + GLOBALS.STANDARD_URL_SEPARATOR + idToShortURL(databaseId));
         return shortUrl;
     }
 
     @Override
-    public Url shortenUrl(String url, String userHash) {
+    public Url shortenUrl(final String url, final String userHash) {
         Url shortUrl = new Url();
-        shortUrl.setPath(computeDomain(url) + "/" + userHash);
+        shortUrl.setPath(computeDomain(url) + GLOBALS.STANDARD_URL_SEPARATOR + userHash);
         return shortUrl;
     }
 
-    private String computeDomain(String url) {
+    private String computeDomain(final String url) {
         try {
             URI uri = new URI(url);
             String domain = uri.getHost();
             String domainWithoutTopLevelAttribute =
-                    domain.startsWith("www.") ? domain.substring(4).split("\\.")[0] : domain.split("\\.")[0];
-            return uri.getScheme() + "://" + new StringBuffer(domainWithoutTopLevelAttribute)
-                    .insert(domainWithoutTopLevelAttribute.length() - 2, ".").toString();
-        } catch (URISyntaxException e) {
-            return null;
+                    domain.startsWith(GLOBALS.INTERNET_W3) ? domain.substring(4).split(GLOBALS.DOT_ESCAPED)[0]
+                            : domain.split(GLOBALS.DOT_ESCAPED)[0];
+
+            return uri.getScheme() + GLOBALS.PROTOCOL_TO_DOMAIN_SEPARATOR
+                    + new StringBuffer(domainWithoutTopLevelAttribute)
+                            .insert(domainWithoutTopLevelAttribute.length() - 2, GLOBALS.DOMAIN_NAME_SEPARATOR)
+                            .toString();
+        } catch (URISyntaxException uriSyntaxException) {
+            throw new BusinessLogicException("Domain from the URL coudln't be computed", uriSyntaxException);
         }
     }
 
-    private String idToShortURL(long databaseId) {
-        final char[] ALPHANUMERICS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
+    private String idToShortURL(@NotNull final long databaseId) {
+        final char[] alphanumerics = GLOBALS.ALPHANUMERIC_LITERALS.toCharArray();
 
-        final int BASE = ALPHANUMERICS.length;
+        final int base = alphanumerics.length;
 
-        if (databaseId < 0)
-            throw new IllegalArgumentException("Number must be positive: " + databaseId);
-        if (databaseId == 0)
-            return "0";
+        if (databaseId < 0 || databaseId == 0) {
+            throw new BusinessLogicException("Database Id must be positive: " + databaseId);
+        }
+
         StringBuilder buf = new StringBuilder();
-        while (databaseId != 0) {
-            buf.append(ALPHANUMERICS[(int) (databaseId % BASE)]);
-            databaseId /= BASE;
+        long base62Index = databaseId;
+        while (base62Index != 0) {
+            buf.append(alphanumerics[(int) (base62Index % base)]);
+            base62Index /= base;
         }
         return buf.reverse().toString();
     }
 
-    private long shortURLtoId(String shortUrl) {
+    private long shortURLtoId(final String shortUrl) {
         long id = 0;
         char[] shortUrlArray = shortUrl.toCharArray();
         for (int i = 0; i < shortUrl.length(); i++) {
@@ -86,14 +95,14 @@ public class UrlConverter implements IConverter {
         return id;
     }
 
-    public boolean isUrl(String url) {
-        String[] customSchemes = { "http", "https" };
+    public boolean isUrl(final String url) {
+        String[] customSchemes = GLOBALS.ALLOWED_PROTOCOLS_FOR_URL;
         UrlValidator urlValidator = new UrlValidator(customSchemes);
         return urlValidator.isValid(url);
     }
 
-    public String getHash(String shortUrl) {
-        Pattern pattern = Pattern.compile(".*/\\s*(.*)");
+    public String getHash(final String shortUrl) {
+        Pattern pattern = Pattern.compile(GLOBALS.SHORT_URL_REGEX);
         Matcher localMatcher = pattern.matcher(shortUrl);
 
         if (localMatcher.find()) {
