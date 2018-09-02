@@ -14,5 +14,5 @@ import com.daimler.urlapp.model.Url;
 @Repository
 public interface UrlStore extends JpaRepository<Url, Long> {
   
-    public Url fetchByCustomHash(@Param("hash") String hash);
+    Url fetchByCustomHash(@Param("hash") String hash);
 }

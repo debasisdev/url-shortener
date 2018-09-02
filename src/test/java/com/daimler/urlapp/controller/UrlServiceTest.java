@@ -22,7 +22,7 @@ import com.daimler.urlapp.model.Url;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = UrlShortenerApp.class)
-public class UrlConverterTest {
+public class UrlServiceTest {
 
     @Autowired
     private UrlService urlService;
