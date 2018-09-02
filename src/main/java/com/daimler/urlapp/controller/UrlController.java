@@ -2,6 +2,7 @@ package com.daimler.urlapp.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import com.daimler.urlapp.model.Url;
 import com.daimler.urlapp.store.UrlStore;
 
 /**
+ * Endpoints for URL Application.
  * 
  * @author Debasis Kar <debasis.babun@gmail.com>
  *
@@ -36,11 +38,25 @@ public class UrlController {
 	@Autowired
 	private UrlService urlService;
 	
+	/**
+	 * Retrieves all the persisted URLs.
+	 * 
+	 * @param pageable
+	 *            pagination information
+	 * @return list of all saved URLs
+	 */
 	@GetMapping("/urls")
 	public List<Url> getUrls(Pageable pageable) {
 		return urlStore.findAll(pageable).getContent();
 	}
 	
+	/**
+	 * Shortens a given URL with an auto-generated Hash.
+	 * 
+	 * @param url
+	 *            Long URL
+	 * @return see {@link HttpServletResponse}
+	 */
 	@PostMapping("/urls/shorten")
 	public ResponseEntity<?> shortenUrl(@Valid @RequestBody final Url url) {
 		if (urlService.isUrl(url.getPath())) {
@@ -56,12 +72,21 @@ public class UrlController {
 		}
 	}
 	
+	/**
+	 * Shortens a given URL with an user-defined Hash.
+	 * 
+	 * @param userHash
+	 *            custom hash provided by User
+	 * @param url
+	 *            Long URL
+	 * @return see {@link HttpServletResponse}
+	 */
 	@PostMapping("/urls/shorten/{userHash}")
 	public ResponseEntity<?> shortenUrl(@PathVariable final String userHash, @Valid @RequestBody Url url) {
 		Url existingUrl = urlStore.fetchByCustomHash(userHash);
 		
 		if (existingUrl != null && existingUrl.compareTo(url) == 0) {
-			throw new BusinessLogicException("Hash not available anymre for the requested domain.");
+			throw new BusinessLogicException("Hash not available anymore for the requested domain.");
 		}
 		
 		if (urlService.isUrl(url.getPath())) {
@@ -79,6 +104,13 @@ public class UrlController {
 		
 	}
 	
+	/**
+	 * Redirects a given short URL to its real Long URL.
+	 * 
+	 * @param url
+	 *            Short URL
+	 * @return see {@link HttpServletResponse}
+	 */
 	@PostMapping("/urls/expand")
 	public ResponseEntity<?> redirectUrl(@Valid @RequestBody final Url url) {
 		long id = urlService.getDatabaseId(url.getPath());
@@ -96,6 +128,15 @@ public class UrlController {
 		}
 	}
 	
+	/**
+	 * Updates an URL entry in the database.
+	 * 
+	 * @param urlId
+	 *            database id of URL
+	 * @param url
+	 *            new URL (which need to be saved)
+	 * @return see {@link HttpServletResponse}
+	 */
 	@PutMapping("/urls/{urlId}")
 	public ResponseEntity<?> updateQuestion(@PathVariable final Long urlId, @Valid @RequestBody Url url) {
 		return urlStore.findById(urlId).map(urlHit -> {
@@ -105,6 +146,13 @@ public class UrlController {
 		}).orElseThrow(() -> new ResourceNotFoundException("URL not found with id " + urlId));
 	}
 	
+	/**
+	 * Removes an URL entry from the database.
+	 * 
+	 * @param urlId
+	 *            database id of URL
+	 * @return see {@link HttpServletResponse}
+	 */
 	@DeleteMapping("/urls/{urlId}")
 	public ResponseEntity<?> deleteUrl(@PathVariable final Long urlId) {
 		return urlStore.findById(urlId).map(url -> {

@@ -15,6 +15,7 @@ import com.daimler.urlapp.GLOBALS;
 import com.daimler.urlapp.exception.BusinessLogicException;
 
 /**
+ * URL Model for the URL Shortener Application.
  * 
  * @author Debasis Kar <debasis.babun@gmail.com>
  *

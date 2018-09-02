@@ -13,6 +13,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.daimler.urlapp.model.Url;
 
 /**
+ * Test placeholder to test the JpaRepository query with a
+ * {@link TestEntityManager}.
  * 
  * @author Debasis Kar <d.kar@reply.de>
  *
