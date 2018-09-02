@@ -41,7 +41,7 @@ public class UrlStoreJpaTest {
 	@Test
 	public void testFindByCustomHash() {
 		entityManager.persist(sampleUrl);
-		Url url = urlStore.fetchByCustomHash("cars");
+		Url url = urlStore.fetchByCustomHash("cars").get(0);
 		assertEquals(sampleUrl.getPath(), url.getPath());
 	}
 	

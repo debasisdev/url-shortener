@@ -83,10 +83,13 @@ public class UrlController {
 	 */
 	@PostMapping("/urls/shorten/{userHash}")
 	public ResponseEntity<?> shortenUrl(@PathVariable final String userHash, @Valid @RequestBody Url url) {
-		Url existingUrl = urlStore.fetchByCustomHash(userHash);
+		List<Url> existingUrl = urlStore.fetchByCustomHash(userHash);
 		
-		if (existingUrl != null && existingUrl.compareTo(url) == 0) {
-			throw new BusinessLogicException("Hash not available anymore for the requested domain.");
+		if (existingUrl != null && !existingUrl.isEmpty()) {
+			if (existingUrl.stream().filter(eu -> eu.compareTo(url) == 0).count() > 0) {
+				System.err.println("Bhaag");
+				throw new BusinessLogicException("Hash not available anymore for the requested domain.");
+			}
 		}
 		
 		if (urlService.isUrl(url.getPath())) {
@@ -119,9 +122,10 @@ public class UrlController {
 			return new ResponseEntity<Url>(urlStore.findById(id).get(), HttpStatus.TEMPORARY_REDIRECT);
 		} else {
 			String hash = urlService.getHash(url.getPath());
-			Url longUrl = urlStore.fetchByCustomHash(hash);
-			if (longUrl != null) {
-				return new ResponseEntity<Url>(longUrl, HttpStatus.TEMPORARY_REDIRECT);
+			List<Url> longUrl = urlStore.fetchByCustomHash(hash);
+			if (longUrl != null && !longUrl.isEmpty()) {
+				Url result = longUrl.stream().filter(lu -> url.getPath().contains(lu.computeDomain())).findAny().get();
+				return new ResponseEntity<Url>(result, HttpStatus.TEMPORARY_REDIRECT);
 			} else {
 				throw new ResourceNotFoundException("URL doesn't exist in database.");
 			}
