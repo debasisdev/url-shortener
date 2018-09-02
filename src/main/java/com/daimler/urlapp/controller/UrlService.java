@@ -1,7 +1,5 @@
 package com.daimler.urlapp.controller;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,7 +18,7 @@ import com.daimler.urlapp.model.Url;
  *
  */
 @Service
-public class UrlService implements IConverter<Url> {
+public class UrlService implements IService<Url> {
 
     @Override
     public long getDatabaseId(final String shortUrl) {
@@ -35,30 +33,15 @@ public class UrlService implements IConverter<Url> {
     @Override
     public Url shortenUrl(final Url url) {
         Url shortUrl = new Url();
-        shortUrl.setPath(computeDomain(url.getPath()) + GLOBALS.STANDARD_URL_SEPARATOR + idToShortURL(url.getId()));
+        shortUrl.setPath(url.computeDomain() + GLOBALS.STANDARD_URL_SEPARATOR + idToShortURL(url.getId()));
         return shortUrl;
     }
 
     @Override
     public Url shortenUrl(final Url url, final String userHash) {
         Url shortUrl = new Url();
-        shortUrl.setPath(computeDomain(url.getPath()) + GLOBALS.STANDARD_URL_SEPARATOR + userHash);
+        shortUrl.setPath(url.computeDomain() + GLOBALS.STANDARD_URL_SEPARATOR + userHash);
         return shortUrl;
-    }
-
-    private String computeDomain(final String url) {
-        try {
-            URI uri = new URI(url);
-            String[] domain = uri.getHost().split(GLOBALS.DOT_ESCAPED);
-            StringBuffer dnsName = new StringBuffer(domain.length > 2 ? domain[1] : domain[0]);
-            if (dnsName.length() < 3) {
-                dnsName.append(GLOBALS.GENERIC_ZOP_DOMAIN);
-            }
-            return uri.getScheme() + GLOBALS.PROTOCOL_TO_DOMAIN_SEPARATOR
-                    + new StringBuffer(dnsName).insert(dnsName.length() - 2, GLOBALS.DOMAIN_NAME_SEPARATOR).toString();
-        } catch (URISyntaxException uriSyntaxException) {
-            throw new BusinessLogicException("Domain from the URL coudln't be computed", uriSyntaxException);
-        }
     }
 
     private String idToShortURL(@NotNull final long databaseId) {

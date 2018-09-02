@@ -7,7 +7,7 @@ import com.daimler.urlapp.model.AuditEntity;
  * @author Debasis Kar <debasis.babun@gmail.com>
  *
  */
-public interface IConverter<T extends AuditEntity> {
+public interface IService<T extends AuditEntity> {
 
     T shortenUrl(T t);
 

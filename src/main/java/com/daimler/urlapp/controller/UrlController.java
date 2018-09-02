@@ -58,6 +58,12 @@ public class UrlController {
 	
 	@PostMapping("/urls/shorten/{userHash}")
 	public ResponseEntity<?> shortenUrl(@PathVariable final String userHash, @Valid @RequestBody Url url) {
+		Url existingUrl = urlStore.fetchByCustomHash(userHash);
+		
+		if (existingUrl != null && existingUrl.compareTo(url) == 0) {
+			throw new BusinessLogicException("Hash not available anymre for the requested domain.");
+		}
+		
 		if (urlService.isUrl(url.getPath())) {
 			url.setCustomHash(userHash);
 			Url savedUrl = urlStore.save(url);
@@ -70,6 +76,7 @@ public class UrlController {
 		} else {
 			throw new InvalidUserRequestException("URL is not Valid.");
 		}
+		
 	}
 	
 	@PostMapping("/urls/expand")

@@ -20,6 +20,11 @@ import com.daimler.urlapp.UrlShortenerApp;
 import com.daimler.urlapp.controller.UrlService;
 import com.daimler.urlapp.model.Url;
 
+/**
+ * 
+ * @author Debasis Kar <d.kar@reply.de>
+ *
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = UrlShortenerApp.class)
 public class UrlServiceTest {
