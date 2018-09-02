@@ -123,7 +123,8 @@ public class UrlController {
 			String hash = urlService.getHash(url.getPath());
 			List<Url> longUrl = urlStore.fetchByCustomHash(hash);
 			if (longUrl != null && !longUrl.isEmpty()) {
-				Url result = longUrl.stream().filter(lu -> url.getPath().contains(lu.computeDomain())).findAny().get();
+				Url result = longUrl.stream().filter(lu -> url.getPath().contains(lu.computeDomain())).findAny()
+				        .orElseThrow(() -> new ResourceNotFoundException("URL doesn't exist in database."));
 				return new ResponseEntity<Url>(result, HttpStatus.TEMPORARY_REDIRECT);
 			} else {
 				throw new ResourceNotFoundException("URL doesn't exist in database.");
