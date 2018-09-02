@@ -6,8 +6,6 @@ public final class GLOBALS {
 
     public static final String DOMAIN_NAME_SEPARATOR = ".";
 
-    public static final String INTERNET_W3 = "www.";
-
     public static final String DOT_ESCAPED = "\\.";
 
     public static final String PROTOCOL_TO_DOMAIN_SEPARATOR = "://";

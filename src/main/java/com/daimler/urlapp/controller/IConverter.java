@@ -1,17 +1,17 @@
 package com.daimler.urlapp.controller;
 
-import com.daimler.urlapp.model.Url;
+import com.daimler.urlapp.model.AuditEntity;
 
 /**
  * 
  * @author Debasis Kar <debasis.babun@gmail.com>
  *
  */
-public interface IConverter {
+public interface IConverter<T extends AuditEntity> {
 
-    Url shortenUrl(String url, long databaseId);
+    T shortenUrl(T t);
 
-    Url shortenUrl(String url, String userHash);
+    T shortenUrl(T t, String userHash);
 
     long getDatabaseId(String shortUrl);
 }

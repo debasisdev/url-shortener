@@ -20,7 +20,7 @@ import com.daimler.urlapp.model.Url;
  *
  */
 @Service
-public class UrlConverter implements IConverter {
+public class UrlService implements IConverter<Url> {
 
     @Override
     public long getDatabaseId(final String shortUrl) {
@@ -33,20 +33,20 @@ public class UrlConverter implements IConverter {
     }
 
     @Override
-    public Url shortenUrl(final String url, final long databaseId) {
+    public Url shortenUrl(final Url url) {
         Url shortUrl = new Url();
-        shortUrl.setPath(computeDomain(url) + GLOBALS.STANDARD_URL_SEPARATOR + idToShortURL(databaseId));
+        shortUrl.setPath(computeDomain(url.getPath()) + GLOBALS.STANDARD_URL_SEPARATOR + idToShortURL(url.getId()));
         return shortUrl;
     }
 
     @Override
-    public Url shortenUrl(final String url, final String userHash) {
+    public Url shortenUrl(final Url url, final String userHash) {
         Url shortUrl = new Url();
-        shortUrl.setPath(computeDomain(url) + GLOBALS.STANDARD_URL_SEPARATOR + userHash);
+        shortUrl.setPath(computeDomain(url.getPath()) + GLOBALS.STANDARD_URL_SEPARATOR + userHash);
         return shortUrl;
     }
 
-    public String computeDomain(final String url) {
+    private String computeDomain(final String url) {
         try {
             URI uri = new URI(url);
             String[] domain = uri.getHost().split(GLOBALS.DOT_ESCAPED);

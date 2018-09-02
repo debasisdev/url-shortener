@@ -34,7 +34,7 @@ public class UrlController {
     private UrlStore urlStore;
 
     @Autowired
-    private UrlConverter urlConverter;
+    private UrlService urlService;
 
     @GetMapping("/urls")
     public List<Url> getUrls(Pageable pageable) {
@@ -43,9 +43,9 @@ public class UrlController {
 
     @PostMapping("/urls/shorten")
     public ResponseEntity<?> shortenUrl(@Valid @RequestBody final Url url) {
-        if (urlConverter.isUrl(url.getPath())) {
-            long id = urlStore.save(url).getId();
-            Url shortUrl = urlConverter.shortenUrl(url.getPath(), id);
+        if (urlService.isUrl(url.getPath())) {
+            Url savedUrl = urlStore.save(url);
+            Url shortUrl = urlService.shortenUrl(savedUrl);
             if (shortUrl != null) {
                 return ResponseEntity.ok(shortUrl);
             } else {
@@ -58,10 +58,10 @@ public class UrlController {
 
     @PostMapping("/urls/shorten/{userHash}")
     public ResponseEntity<?> shortenUrl(@PathVariable final String userHash, @Valid @RequestBody Url url) {
-        if (urlConverter.isUrl(url.getPath())) {
+        if (urlService.isUrl(url.getPath())) {
             url.setCustomHash(userHash);
-            urlStore.save(url);
-            Url shortUrl = urlConverter.shortenUrl(url.getPath(), userHash);
+            Url savedUrl = urlStore.save(url);
+            Url shortUrl = urlService.shortenUrl(savedUrl, userHash);
             if (shortUrl != null) {
                 return ResponseEntity.ok(shortUrl);
             } else {
@@ -74,12 +74,12 @@ public class UrlController {
 
     @PostMapping("/urls/expand")
     public ResponseEntity<?> redirectUrl(@Valid @RequestBody final Url url) {
-        long id = urlConverter.getDatabaseId(url.getPath());
+        long id = urlService.getDatabaseId(url.getPath());
 
         if (urlStore.findById(id).isPresent()) {
             return new ResponseEntity<Url>(urlStore.findById(id).get(), HttpStatus.TEMPORARY_REDIRECT);
         } else {
-            String hash = urlConverter.getHash(url.getPath());
+            String hash = urlService.getHash(url.getPath());
             Url longUrl = urlStore.fetchByCustomHash(hash);
             if (longUrl != null) {
                 return new ResponseEntity<Url>(longUrl, HttpStatus.TEMPORARY_REDIRECT);

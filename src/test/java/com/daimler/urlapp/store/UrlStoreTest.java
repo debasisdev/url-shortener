@@ -1,4 +1,4 @@
-package com.example.urlapp.store.test;
+package com.daimler.urlapp.store;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
