@@ -87,7 +87,6 @@ public class UrlController {
 		
 		if (existingUrl != null && !existingUrl.isEmpty()) {
 			if (existingUrl.stream().filter(eu -> eu.compareTo(url) == 0).count() > 0) {
-				System.err.println("Bhaag");
 				throw new BusinessLogicException("Hash not available anymore for the requested domain.");
 			}
 		}
