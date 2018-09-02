@@ -1,21 +1,34 @@
-## URL Shortener App Demo
+# URL Shortener Application (JEE + SpringBoot + Hibernate)
+## Getting Started
 
-## Steps to Setup
+**Prerequisites:**
+* **[JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)** (v1.8.0_181 or later recommended)
+* **[Maven](https://maven.apache.org/download.cgi)** (v3.5.0 or later recommended)
+* **[Docker](https://docs.docker.com/release-notes/docker-ce/)** (v17.09.0-ce or later recommended)
+* **[Internet connectivity](https://dictionary.cambridge.org/dictionary/english/internet)**
 
-**1. Clone the repository**
+Most often running the `mvn clean` version in `pom.xml` and running `mvn install` in this directory should be enough. For non-docker setup, `mvn spring-boot:run` could be used as well.
 
-```bash
-git clone 
-```
+<hr/>
 
-**2. Run the App inside Docker**
+### Docker Deploy
 Generate a JAR file for the application by running
 ```bash
 mvn clean install -DskipTests
 ```
+Build the image with docker-compose and start the container with the following one-line command. It's advisable not to use the cached images in some scenarios.
 
-Type the following command from the root directory of the project to run it -
-
-```bash
+```
 docker-compose down && docker-compose build --no-cache && docker-compose up --force-recreate --remove-orphans
 ```
+
+When the server is ready, start the Frontend as well or import the Postman-Collection for playing around. Swagger UI is available at: [Swagger](http://localhost:8080/swagger-ui.html)🚀
+
+##### (OPTIONAL) To stop and kill all containers along with removing all images
+```
+docker kill $(docker ps -q) && docker rm $(docker ps -a -q) && docker rmi $(docker images -q)
+```
+<hr/>
+
+## Maintainer
+[Debasis Kar](mailto:debasis.babun@gmail.com)
