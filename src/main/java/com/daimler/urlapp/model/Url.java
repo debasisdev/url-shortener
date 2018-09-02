@@ -88,7 +88,7 @@ public class Url extends AuditEntity {
 
     @Override
     public String toString() {
-        return "this.getClass().getSimpleName() +  \"[id=" + id + ", path=" + path + "]";
+        return this.getClass().getSimpleName() + "[id:" + id + ", path:" + path + "]";
     }
 
 }

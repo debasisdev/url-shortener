@@ -46,18 +46,16 @@ public class UrlConverter implements IConverter {
         return shortUrl;
     }
 
-    private String computeDomain(final String url) {
+    public String computeDomain(final String url) {
         try {
             URI uri = new URI(url);
-            String domain = uri.getHost();
-            String domainWithoutTopLevelAttribute =
-                    domain.startsWith(GLOBALS.INTERNET_W3) ? domain.substring(4).split(GLOBALS.DOT_ESCAPED)[0]
-                            : domain.split(GLOBALS.DOT_ESCAPED)[0];
-
+            String[] domain = uri.getHost().split(GLOBALS.DOT_ESCAPED);
+            StringBuffer dnsName = new StringBuffer(domain.length > 2 ? domain[1] : domain[0]);
+            if (dnsName.length() < 3) {
+                dnsName.append(GLOBALS.GENERIC_ZOP_DOMAIN);
+            }
             return uri.getScheme() + GLOBALS.PROTOCOL_TO_DOMAIN_SEPARATOR
-                    + new StringBuffer(domainWithoutTopLevelAttribute)
-                            .insert(domainWithoutTopLevelAttribute.length() - 2, GLOBALS.DOMAIN_NAME_SEPARATOR)
-                            .toString();
+                    + new StringBuffer(dnsName).insert(dnsName.length() - 2, GLOBALS.DOMAIN_NAME_SEPARATOR).toString();
         } catch (URISyntaxException uriSyntaxException) {
             throw new BusinessLogicException("Domain from the URL coudln't be computed", uriSyntaxException);
         }
