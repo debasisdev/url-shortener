@@ -1,12 +1,12 @@
 # URL Shortener Application (JEE + SpringBoot + Hibernate + Postgres)
 ## Getting Started
 
-**Prerequisites:**
+**Prerequisites (Developed and Tested with):**
 
-* **[JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)** (v1.8.0_181 or later recommended)
-* **[Maven](https://maven.apache.org/download.cgi)** (v3.5.0 or later recommended)
-* **[Docker](https://docs.docker.com/release-notes/docker-ce/)** (v17.09.0-ce or later recommended)
-* **[pgAdmin](https://www.pgadmin.org/download/)** (4 or later recommended)
+* **[JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)** (v1.8.0_181 or later)
+* **[Maven](https://maven.apache.org/download.cgi)** (v3.5.0 or later)
+* **[Docker](https://docs.docker.com/release-notes/docker-ce/)** (v17.09.0-ce or later)
+* **[pgAdmin](https://www.pgadmin.org/download/)** (4 or later)
 * **[Internet connectivity](https://dictionary.cambridge.org/dictionary/english/internet)**
 
 Most often running the `mvn clean` version in `pom.xml` and running `mvn install` in this directory should be enough. For non-docker setup, `mvn spring-boot:run` could be used as well.
