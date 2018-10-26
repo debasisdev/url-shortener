@@ -1,0 +1,8 @@
+image: maven:3.3.9
+
+pipelines:
+  branches:
+    master:
+      - step:
+          script:
+            - mvn clean install
